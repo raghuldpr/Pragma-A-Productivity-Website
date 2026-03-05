@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pragma — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ──────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:    #110f0d;
+      --ink2:   #2e2a26;
+      --ash:    #7a7168;
+      --cream:  #f4efe5;
+      --paper:  #faf7f1;
+      --gold:   #c8a44a;
+      --gold-l: #e5c878;
+      --rust:   #b04e28;
+      --border: rgba(17,15,13,0.1);
+      --shadow: 0 4px 32px rgba(17,15,13,0.1);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'DM Mono', monospace;
+      background: var(--ink);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* ── Layout ────────────────────────────── */
+    .page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── Left Panel ─────────────────────────  */
+    .left-panel {
+      background: var(--ink);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 80px 72px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 80%, rgba(200,164,74,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 80% 20%, rgba(200,164,74,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .left-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .brand {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 72px;
+    }
+
+    .brand-wordmark {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.8rem;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      color: var(--paper);
+      line-height: 1;
+    }
+
+    .brand-wordmark em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .brand-tagline {
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-top: 8px;
+    }
+
+    .brand-divider {
+      width: 48px;
+      height: 1px;
+      background: var(--gold);
+      margin: 20px 0;
+    }
+
+    .left-features {
+      position: relative;
+      z-index: 1;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(200,164,74,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .feature-icon svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--gold);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .feature-text h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: var(--paper);
+      margin-bottom: 2px;
+    }
+
+    .feature-text p {
+      font-size: 0.68rem;
+      color: var(--ash);
+      letter-spacing: 0.05em;
+      line-height: 1.6;
+    }
+
+    .left-footer {
+      position: absolute;
+      bottom: 40px;
+      left: 72px;
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(122,113,104,0.5);
+    }
+
+    /* ── Right Panel ────────────────────────── */
+    .right-panel {
+      background: var(--paper);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 72px;
+      position: relative;
+    }
+
+    .right-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 4px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-l), var(--gold));
+    }
+
+    .form-container {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* ── Tab switcher ──────────────────────── */
+    .tab-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 40px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 14px 0;
+      background: none;
+      border: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--ash);
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    .tab-btn.active {
+      color: var(--ink);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 2px;
+      background: var(--gold);
+    }
+
+    /* ── Form ──────────────────────────────── */
+    .form-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .form-subtitle {
+      font-size: 0.67rem;
+      color: var(--ash);
+      letter-spacing: 0.1em;
+      margin-bottom: 36px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.58rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1px solid var(--border);
+      background: white;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--ink);
+      outline: none;
+      border-radius: 1px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-input::placeholder { color: #c0b8ad; }
+
+    .form-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(200,164,74,0.12);
+    }
+
+    .gmail-wrap {
+      position: relative;
+    }
+
+    .gmail-badge {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(200,164,74,0.3);
+      padding: 2px 6px;
+    }
+
+    .password-wrap {
+      position: relative;
+    }
+
+    .toggle-pw {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: var(--ash);
+    }
+
+    .toggle-pw svg {
+      width: 16px; height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    /* ── Submit Button ─────────────────────── */
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--ink);
+      color: var(--gold);
+      border: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: background 0.2s, transform 0.1s;
+      border-radius: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn:hover { background: var(--ink2); }
+    .submit-btn:active { transform: scale(0.99); }
+
+    .submit-btn.loading::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: -100%;
+      width: 100%; height: 2px;
+      background: var(--gold);
+      animation: loading-bar 1s ease-in-out infinite;
+    }
+
+    @keyframes loading-bar {
+      0%   { left: -100%; }
+      100% { left: 100%;  }
+    }
+
+    /* ── Message ───────────────────────────── */
+    .msg-box {
+      margin-top: 16px;
+      padding: 12px 16px;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      display: none;
+      border-radius: 1px;
+    }
+
+    .msg-box.error {
+      display: block;
+      background: rgba(176,78,40,0.08);
+      border: 1px solid rgba(176,78,40,0.2);
+      color: var(--rust);
+    }
+
+    .msg-box.success {
+      display: block;
+      background: rgba(90,122,94,0.08);
+      border: 1px solid rgba(90,122,94,0.25);
+      color: #3a6040;
+    }
+
+    /* ── Divider ───────────────────────────── */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ash);
+    }
+
+    .or-divider::before, .or-divider::after {
+      content: ''; flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      color: var(--ash);
+      text-decoration: none;
+      margin-top: 6px;
+      transition: color 0.2s;
+    }
+    .forgot-link:hover { color: var(--gold); }
+
+    /* ── Responsive ────────────────────────── */
+    @media (max-width: 768px) {
+      .page { grid-template-columns: 1fr; }
+      .left-panel { display: none; }
+      .right-panel { padding: 48px 32px; }
+    }
+
+    /* ── Panel fade-in ─────────────────────── */
+    .form-panel { display: none; }
+    .form-panel.active {
+      display: block;
+      animation: fadeUp 0.3s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0);   }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ── Left Panel ──────────────────────── -->
+  <div class="left-panel">
+    <div class="left-grid"></div>
+
+    <div class="brand">
+      <div class="brand-wordmark">Pr<em>ag</em>ma</div>
+      <div class="brand-tagline">Purposeful Productivity</div>
+      <div class="brand-divider"></div>
+    </div>
+
+    <div class="left-features">
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div class="feature-text">
+          <h3>Intelligent Task Management</h3>
+          <p>Organize tasks by priority, category &amp; deadline</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="feature-text">
+          <h3>Progress Tracking</h3>
+          <p>Visual dashboards show your daily momentum</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="feature-text">
+          <h3>Secure &amp; Private</h3>
+          <p>C-powered backend with encrypted sessions</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="left-footer">© 2025 Pragma · Built with Apache + C + MySQL</div>
+  </div>
+
+  <!-- ── Right Panel ──────────────────────── -->
+  <div class="right-panel">
+    <div class="form-container">
+
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="showTab('login')">Sign In</button>
+        <button class="tab-btn"        onclick="showTab('register')">Register</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div class="form-panel active" id="panel-login">
+        <h2 class="form-title">Welcome back</h2>
+        <p class="form-subtitle">Sign in with your Gmail account to continue</p>
+
+        <div class="form-group">
+          <label class="form-label">Gmail Address</label>
+          <div class="gmail-wrap">
+            <input type="email" id="login-gmail" class="form-input"
+                   placeholder="you@gmail.com" autocomplete="email" />
+            <span class="gmail-badge">Gmail</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="login-password" class="form-input"
+                   placeholder="••••••••" autocomplete="current-password" />
+            <button class="toggle-pw" onclick="togglePw('login-password', this)" type="button">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button class="submit-btn" id="login-btn" onclick="doLogin()">Sign In</button>
+        <div class="msg-box" id="login-msg"></div>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div class="form-panel" id="panel-register">
+        <h2 class="form-title">Create account</h2>
+        <p class="form-subtitle">Join Pragma and take control of your day</p>
+
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="reg-name" class="form-input"
+                 placeholder="Your Name" autocomplete="name" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Gmail Address</label>
+          <div class="gmail-wrap">
+            <input type="email" id="reg-gmail" class="form-input"
+                   placeholder="you@gmail.com" autocomplete="email" />
+            <span class="gmail-badge">Gmail</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="reg-password" class="form-input"
+                   placeholder="Min. 8 characters" autocomplete="new-password" />
+            <button class="toggle-pw" onclick="togglePw('reg-password', this)" type="button">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <button class="submit-btn" id="reg-btn" onclick="doRegister()">Create Account</button>
+        <div class="msg-box" id="reg-msg"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── Tab switching ───────────────────── */
+  function showTab(name) {
+    document.querySelectorAll('.tab-btn').forEach((b,i) =>
+      b.classList.toggle('active', (i===0 && name==='login') || (i===1 && name==='register')));
+    document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  /* ── Toggle password visibility ─────── */
+  function togglePw(id, btn) {
+    const input = document.getElementById(id);
+    const show  = input.type === 'password';
+    input.type  = show ? 'text' : 'password';
+    btn.querySelector('svg').innerHTML = show
+      ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`
+      : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+  }
+
+  /* ── Show message ────────────────────── */
+  function showMsg(id, text, type) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className   = 'msg-box ' + type;
+  }
+
+  /* ── CGI API base ────────────────────── */
+  const API = '/cgi-bin/pragma/auth.exe';
+
+  async function postForm(url, data) {
+    const body = Object.entries(data)
+      .map(([k,v]) => encodeURIComponent(k)+'='+encodeURIComponent(v))
+      .join('&');
+    const res  = await fetch(url, {
+      method:  'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body
+    });
+    return res.json();
+  }
+
+  /* ── Login ───────────────────────────── */
+  async function doLogin() {
+    const gmail    = document.getElementById('login-gmail').value.trim();
+    const password = document.getElementById('login-password').value;
+    const btn      = document.getElementById('login-btn');
+
+    if (!gmail.endsWith('@gmail.com')) {
+      showMsg('login-msg','Please enter a valid @gmail.com address','error'); return;
+    }
+    if (!password) { showMsg('login-msg','Password is required','error'); return; }
+
+    btn.classList.add('loading');
+    btn.textContent = 'Signing in...';
+
+    try {
+      const json = await postForm(API + '?action=login', { gmail, password });
+      if (json.success) {
+        localStorage.setItem('pragma_token',    json.token);
+        localStorage.setItem('pragma_user_id',  json.user_id);
+        localStorage.setItem('pragma_name',     json.full_name);
+        localStorage.setItem('pragma_gmail',    json.gmail);
+        showMsg('login-msg','Welcome back! Redirecting…','success');
+        setTimeout(() => window.location.href = 'dashboard.html', 900);
+      } else {
+        showMsg('login-msg', json.error || 'Login failed','error');
+      }
+    } catch {
+      showMsg('login-msg','Connection error. Is the server running?','error');
+    } finally {
+      btn.classList.remove('loading');
+      btn.textContent = 'Sign In';
+    }
+  }
+
+  /* ── Register ────────────────────────── */
+  async function doRegister() {
+    const full_name = document.getElementById('reg-name').value.trim();
+    const gmail     = document.getElementById('reg-gmail').value.trim();
+    const password  = document.getElementById('reg-password').value;
+    const btn       = document.getElementById('reg-btn');
+
+    if (!full_name) { showMsg('reg-msg','Full name is required','error'); return; }
+    if (!gmail.endsWith('@gmail.com')) {
+      showMsg('reg-msg','Only @gmail.com addresses are accepted','error'); return;
+    }
+    if (password.length < 8) {
+      showMsg('reg-msg','Password must be at least 8 characters','error'); return;
+    }
+
+    btn.classList.add('loading');
+    btn.textContent = 'Creating account...';
+
+    try {
+      const json = await postForm(API + '?action=register', { gmail, password, full_name });
+      if (json.success) {
+        showMsg('reg-msg','Account created! Please sign in.','success');
+        setTimeout(() => showTab('login'), 1200);
+      } else {
+        showMsg('reg-msg', json.error || 'Registration failed','error');
+      }
+    } catch {
+      showMsg('reg-msg','Connection error. Is the server running?','error');
+    } finally {
+      btn.classList.remove('loading');
+      btn.textContent = 'Create Account';
+    }
+  }
+
+  /* ── Enter key support ───────────────── */
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const panel = document.querySelector('.form-panel.active').id;
+    if (panel === 'panel-login')    doLogin();
+    if (panel === 'panel-register') doRegister();
+  });
+
+  /* ── Redirect if already logged in ──── */
+  if (localStorage.getItem('pragma_token'))
+    window.location.href = 'dashboard.html';
+</script>
+</body>
+</html>

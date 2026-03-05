@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pragma — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:    #110f0d;
+      --ink2:   #2e2a26;
+      --ash:    #7a7168;
+      --cream:  #f4efe5;
+      --paper:  #faf7f1;
+      --white:  #ffffff;
+      --gold:   #c8a44a;
+      --gold-l: #e5c878;
+      --rust:   #b04e28;
+      --sage:   #5a7a5e;
+      --border: rgba(17,15,13,0.1);
+      --shadow: 0 2px 16px rgba(17,15,13,0.07);
+    }
+
+    html, body { height: 100%; font-family: 'DM Mono', monospace; background: var(--paper); color: var(--ink); }
+
+    /* ── Top Nav ───────────────────────── */
+    .topnav {
+      background: var(--ink);
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      color: var(--paper);
+    }
+
+    .nav-brand em { font-style: italic; color: var(--gold); }
+
+    .nav-right { display: flex; align-items: center; gap: 24px; }
+
+    .nav-user {
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ash);
+    }
+
+    .nav-user span { color: var(--gold-l); }
+
+    .logout-btn {
+      padding: 7px 16px;
+      background: transparent;
+      border: 1px solid rgba(200,164,74,0.3);
+      color: var(--gold);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover { background: rgba(200,164,74,0.1); }
+
+    /* ── Page ──────────────────────────── */
+    .page {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: calc(100vh - 60px);
+    }
+
+    /* ── Sidebar ───────────────────────── */
+    .sidebar {
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      padding: 40px 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-section {
+      padding: 0 28px;
+      margin-bottom: 32px;
+    }
+
+    .sidebar-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 12px;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      text-decoration: none;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: var(--ash);
+      border-radius: 1px;
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+
+    .sidebar-nav a:hover { background: var(--cream); color: var(--ink); }
+    .sidebar-nav a.active { background: var(--ink); color: var(--gold); }
+
+    .sidebar-nav svg {
+      width: 14px; height: 14px;
+      stroke: currentColor; fill: none; stroke-width: 1.5;
+      flex-shrink: 0;
+    }
+
+    /* ── Stats strip in sidebar ──────────── */
+    .stat-strip {
+      margin-top: auto;
+      padding: 28px;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-row:last-child { border: none; }
+
+    .stat-row .label {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ash);
+    }
+
+    .stat-row .val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .stat-row .val.gold { color: var(--gold); }
+    .stat-row .val.rust { color: var(--rust); }
+    .stat-row .val.sage { color: var(--sage); }
+
+    /* ── Main Content ──────────────────── */
+    .main {
+      padding: 48px 56px;
+      overflow-y: auto;
+    }
+
+    /* ── Page header ───────────────────── */
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+
+    .page-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.8rem;
+      font-weight: 300;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .page-title em { font-style: italic; color: var(--gold); }
+
+    .page-date {
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-top: 4px;
+    }
+
+    /* ── Add Task Form ─────────────────── */
+    .add-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 28px 32px;
+      margin-bottom: 32px;
+    }
+
+    .add-card-header {
+      font-size: 0.58rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .add-card-header::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    .add-form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+
+    .add-input {
+      flex: 1;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      background: var(--paper);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--ink);
+      outline: none;
+      border-radius: 1px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .add-input::placeholder { color: #c0b8ad; }
+
+    .add-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(200,164,74,0.1);
+    }
+
+    .add-select {
+      padding: 11px 32px 11px 14px;
+      border: 1px solid var(--border);
+      background: var(--paper);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--ink);
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7168'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      border-radius: 1px;
+    }
+
+    .add-btn {
+      padding: 11px 24px;
+      background: var(--ink);
+      color: var(--gold);
+      border: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 1px;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .add-btn:hover { background: var(--ink2); }
+
+    /* ── Filter Bar ────────────────────── */
+    .filter-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+
+    .filter-chip {
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ash);
+      cursor: pointer;
+      border-radius: 1px;
+      transition: all 0.15s;
+    }
+
+    .filter-chip:hover { border-color: var(--gold); color: var(--ink); }
+    .filter-chip.active { background: var(--ink); border-color: var(--ink); color: var(--gold); }
+
+    /* ── Task List ─────────────────────── */
+    .task-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .task-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--border);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: box-shadow 0.2s, border-color 0.2s;
+      animation: slideIn 0.25s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-8px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .task-card:hover { box-shadow: var(--shadow); }
+
+    .task-card[data-priority="3"] { border-left-color: var(--rust); }
+    .task-card[data-priority="2"] { border-left-color: var(--gold); }
+    .task-card[data-priority="1"] { border-left-color: var(--sage); }
+    .task-card.done               { opacity: 0.5; }
+
+    .task-check {
+      width: 18px; height: 18px;
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .task-check:hover { border-color: var(--gold); }
+    .task-check.checked { background: var(--sage); border-color: var(--sage); }
+
+    .task-check svg {
+      width: 10px; height: 10px;
+      stroke: white; fill: none; stroke-width: 2.5;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .task-check.checked svg { opacity: 1; }
+
+    .task-body { flex: 1; min-width: 0; }
+
+    .task-title {
+      font-size: 0.85rem;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.15s;
+    }
+
+    .task-card.done .task-title {
+      text-decoration: line-through;
+      color: var(--ash);
+    }
+
+    .task-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .task-cat {
+      font-size: 0.58rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ash);
+    }
+
+    .task-due {
+      font-size: 0.58rem;
+      color: var(--ash);
+    }
+
+    .task-due.overdue { color: var(--rust); }
+
+    .task-pri {
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 1px;
+    }
+
+    .pri-high   { background: rgba(176,78,40,0.1);  color: var(--rust); }
+    .pri-medium { background: rgba(200,164,74,0.12); color: #9a7a2a; }
+    .pri-low    { background: rgba(90,122,94,0.1);   color: var(--sage); }
+
+    .task-delete {
+      width: 28px; height: 28px;
+      background: none; border: none;
+      cursor: pointer;
+      color: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.15s, color 0.15s;
+    }
+
+    .task-card:hover .task-delete { opacity: 1; }
+    .task-delete:hover { color: var(--rust); }
+    .task-delete svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    /* ── Empty state ───────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 80px 40px;
+      color: var(--ash);
+    }
+
+    .empty-state svg {
+      width: 48px; height: 48px;
+      stroke: rgba(122,113,104,0.3);
+      fill: none; stroke-width: 1;
+      margin-bottom: 20px;
+    }
+
+    .empty-state p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 300;
+      font-style: italic;
+    }
+
+    /* ── Loading ───────────────────────── */
+    .loading-indicator {
+      text-align: center;
+      padding: 40px;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--ash);
+    }
+
+    /* ── Toast ─────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 32px; right: 32px;
+      background: var(--ink);
+      color: var(--gold);
+      padding: 14px 22px;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      box-shadow: 0 8px 32px rgba(17,15,13,0.2);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 999;
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    @media (max-width: 900px) {
+      .page { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .main { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Top Nav ─────────────────────────────── -->
+<nav class="topnav">
+  <div class="nav-brand">Pr<em>ag</em>ma</div>
+  <div class="nav-right">
+    <div class="nav-user">Signed in as <span id="nav-name"></span></div>
+    <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- ── Sidebar ─────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Views</div>
+      <nav class="sidebar-nav">
+        <a class="active" onclick="setFilter('all',this)">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          All Tasks
+        </a>
+        <a onclick="setFilter('pending',this)">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Pending
+        </a>
+        <a onclick="setFilter('done',this)">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Completed
+        </a>
+        <a onclick="setFilter('high',this)">
+          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Urgent
+        </a>
+      </nav>
+    </div>
+
+    <div class="stat-strip">
+      <div class="sidebar-label">Overview</div>
+      <div class="stat-row">
+        <span class="label">Total</span>
+        <span class="val" id="stat-total">—</span>
+      </div>
+      <div class="stat-row">
+        <span class="label">Done</span>
+        <span class="val sage" id="stat-done">—</span>
+      </div>
+      <div class="stat-row">
+        <span class="label">Urgent</span>
+        <span class="val rust" id="stat-urgent">—</span>
+      </div>
+      <div class="stat-row">
+        <span class="label">Due Today</span>
+        <span class="val gold" id="stat-today">—</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ────────────────────────────── -->
+  <main class="main">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">My <em>Tasks</em></h1>
+        <p class="page-date" id="today-date"></p>
+      </div>
+    </div>
+
+    <!-- Add Task Card -->
+    <div class="add-card">
+      <div class="add-card-header">New Task</div>
+      <div class="add-form-row">
+        <input type="text" id="task-title" class="add-input"
+               placeholder="What needs to be done?" style="flex:3" />
+        <select id="task-category" class="add-select">
+          <option value="work">Work</option>
+          <option value="personal">Personal</option>
+          <option value="health">Health</option>
+          <option value="finance">Finance</option>
+          <option value="learning">Learning</option>
+          <option value="other">Other</option>
+        </select>
+        <select id="task-priority" class="add-select">
+          <option value="3">High</option>
+          <option value="2" selected>Medium</option>
+          <option value="1">Low</option>
+        </select>
+        <input type="date" id="task-due" class="add-input" style="flex:none;width:150px" />
+        <button class="add-btn" onclick="addTask()">+ Add</button>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <button class="filter-chip active" onclick="setFilter('all',null,this)">All</button>
+      <button class="filter-chip" onclick="setFilter('pending',null,this)">Pending</button>
+      <button class="filter-chip" onclick="setFilter('done',null,this)">Done</button>
+      <button class="filter-chip" onclick="setFilter('high',null,this)">Urgent</button>
+    </div>
+
+    <!-- Task List -->
+    <div class="task-list" id="task-list">
+      <div class="loading-indicator">Loading tasks…</div>
+    </div>
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ── Auth guard ───────────────────────── */
+  const token  = localStorage.getItem('pragma_token');
+  const uname  = localStorage.getItem('pragma_name') || localStorage.getItem('pragma_gmail') || 'User';
+  if (!token) window.location.href = 'index.html';
+
+  document.getElementById('nav-name').textContent = uname;
+
+  /* ── Date ─────────────────────────────── */
+  const today = new Date();
+  document.getElementById('today-date').textContent =
+    today.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  /* ── API base ─────────────────────────── */
+  const TASKS_API = '/cgi-bin/pragma/tasks.exe';
+  const AUTH_API  = '/cgi-bin/pragma/auth.exe';
+
+  let currentFilter = 'all';
+
+  /* ── Toast ────────────────────────────── */
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  /* ── Fetch stats ──────────────────────── */
+  async function loadStats() {
+    try {
+      const res  = await fetch(`${TASKS_API}?action=stats&token=${token}`);
+      const data = await res.json();
+      if (!data.success) return;
+      const s = data.stats;
+      document.getElementById('stat-total').textContent  = s.total;
+      document.getElementById('stat-done').textContent   = s.done;
+      document.getElementById('stat-urgent').textContent = s.urgent;
+      document.getElementById('stat-today').textContent  = s.due_today;
+    } catch {}
+  }
+
+  /* ── Fetch tasks ──────────────────────── */
+  async function loadTasks(filter = 'all') {
+    currentFilter = filter;
+    const list = document.getElementById('task-list');
+    list.innerHTML = '<div class="loading-indicator">Loading…</div>';
+    try {
+      const res  = await fetch(`${TASKS_API}?action=list&token=${token}&filter=${filter}`);
+      const data = await res.json();
+      if (!data.success) { list.innerHTML = '<div class="loading-indicator">Error loading tasks</div>'; return; }
+      renderTasks(data.tasks);
+    } catch {
+      list.innerHTML = '<div class="loading-indicator">Connection error</div>';
+    }
+  }
+
+  /* ── Render ───────────────────────────── */
+  function renderTasks(tasks) {
+    const list = document.getElementById('task-list');
+    if (!tasks.length) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <p>Nothing here yet — add your first task</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = tasks.map(t => {
+      const done    = t.status === 'done';
+      const priMap  = { '3':'high', '2':'medium', '1':'low' };
+      const priLabel= { '3':'High', '2':'Medium', '1':'Low' };
+      const overdue = t.due_date && t.due_date < new Date().toISOString().slice(0,10) && !done;
+      return `
+        <div class="task-card ${done?'done':''}" data-id="${t.id}" data-priority="${t.priority}">
+          <div class="task-check ${done?'checked':''}" onclick="toggleTask(${t.id},'${t.status}')">
+            <svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg>
+          </div>
+          <div class="task-body">
+            <div class="task-title">${escHtml(t.title)}</div>
+            <div class="task-meta">
+              <span class="task-cat">${t.category}</span>
+              ${t.due_date ? `<span class="task-due ${overdue?'overdue':''}">${overdue?'⚠ ':''}${t.due_date}</span>` : ''}
+              <span class="task-pri pri-${priMap[t.priority]||'medium'}">${priLabel[t.priority]||'Medium'}</span>
+            </div>
+          </div>
+          <button class="task-delete" onclick="deleteTask(${t.id})">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>`;
+    }).join('');
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── Add task ─────────────────────────── */
+  async function addTask() {
+    const title    = document.getElementById('task-title').value.trim();
+    const category = document.getElementById('task-category').value;
+    const priority = document.getElementById('task-priority').value;
+    const due_date = document.getElementById('task-due').value;
+    if (!title) { showToast('Please enter a task title'); return; }
+
+    const body = `token=${encodeURIComponent(token)}`
+      + `&title=${encodeURIComponent(title)}`
+      + `&category=${category}&priority=${priority}`
+      + `&due_date=${due_date}`;
+
+    try {
+      const res  = await fetch(TASKS_API + '?action=add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('task-title').value = '';
+        document.getElementById('task-due').value   = '';
+        showToast('Task added');
+        await loadTasks(currentFilter);
+        await loadStats();
+      } else showToast(data.error || 'Failed to add task');
+    } catch { showToast('Connection error'); }
+  }
+
+  /* ── Toggle complete ──────────────────── */
+  async function toggleTask(id, currentStatus) {
+    const newStatus = currentStatus === 'done' ? 'pending' : 'done';
+    const body = `token=${encodeURIComponent(token)}&task_id=${id}&status=${newStatus}`;
+    try {
+      const res  = await fetch(TASKS_API + '?action=update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+      });
+      const data = await res.json();
+      if (data.success) {
+        await loadTasks(currentFilter);
+        await loadStats();
+      }
+    } catch {}
+  }
+
+  /* ── Delete task ──────────────────────── */
+  async function deleteTask(id) {
+    const body = `token=${encodeURIComponent(token)}&task_id=${id}`;
+    try {
+      const res  = await fetch(TASKS_API + '?action=delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Task removed');
+        await loadTasks(currentFilter);
+        await loadStats();
+      }
+    } catch {}
+  }
+
+  /* ── Filters ──────────────────────────── */
+  function setFilter(filter, sidebarEl, chipEl) {
+    /* Sidebar active state */
+    if (sidebarEl) {
+      document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+      sidebarEl.classList.add('active');
+    }
+    /* Chip active state */
+    if (chipEl) {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chipEl.classList.add('active');
+    }
+    loadTasks(filter);
+  }
+
+  /* ── Logout ───────────────────────────── */
+  async function doLogout() {
+    const body = `token=${encodeURIComponent(token)}`;
+    try {
+      await fetch(AUTH_API + '?action=logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+      });
+    } catch {}
+    localStorage.clear();
+    window.location.href = 'index.html';
+  }
+
+  /* ── Enter to add ─────────────────────── */
+  document.getElementById('task-title')
+    .addEventListener('keydown', e => { if (e.key==='Enter') addTask(); });
+
+  /* ── Init ─────────────────────────────── */
+  loadTasks();
+  loadStats();
+</script>
+</body>
+</html>
